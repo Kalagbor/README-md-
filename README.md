@@ -1,9 +1,9 @@
 # README-md-
 #DevOps take-home test
 
-# Complete Manifest in single K8s yaml we defined Deployment & Service for SpringApp & PVC, (with default  StorageClass), HPA, ReplicaSet & Service For Mongo db.
+# Complete Manifest in single K8s yaml. I defined Deployment & Service for SpringApp & PVC, (with default  StorageClass), HPA, ReplicaSet & Service For Mongo db.
 # In this manifest file container1 is the springapp that returns users from mongo database
-# Deploment manifest file for container1
+# DeploYment manifest file for container1
 
 ---
 apiVersion: v1
@@ -11,8 +11,8 @@ kind: ConfigMap
 metadata: 
   name: springappconfigmap
 data: 
-  mongousername: admin*user
-  mongopassword: adminuser*123
+  mongousername: adminuser
+  mongopassword: adminuser123
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -24,7 +24,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 2
-      mazsurge: 1
+      maxsurge: 1
   minReadySeconds: 30
   selector:
     matchLabels:
@@ -44,18 +44,21 @@ spec:
         - name: MONGO_DB_USERNAME
           valueFrom:
             configMapKeyRef:
-              name: mongousername
+              name: springappconfigmap 
+              key: mongousername
         - name: MONGO_DB_HOSTNAME
           valueFrom:
             configMapKeyRef: 
-              name: mongopassword
+              name: springappconfigmap 
+              key: mongopassword
+        resources: 
           requests:
             cpu: 200m
             memory: 64Mi
           limits:
             cpu: 500m
             memory: 1Gi
-        livelinessProbe:
+        livenessProbe:
           httpGet:
             path: /spring-boot-app
             part: 8080
@@ -177,7 +180,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 2
-      mazsurge: 1
+      maxSurge: 1
   minReadySeconds: 30
   selector:
     matchLabels:
@@ -267,7 +270,7 @@ spec:
        
        
  Question4
- To ensure that my dev team only perform certain roles. As the Kubernetes administratior, I will create a role and bind all the menbers of the dev team to that role using RBAC. This can be executed using the manifest file;
+ To ensure that my dev team only perform certain roles. As the Kubernetes administratior, I will create a role and bind all the menbers of the dev team to that role using RBAC. This can be executed using the manifest file written below;
  
  #RBAC to assign privilleges to members of the dev team
 
@@ -277,7 +280,7 @@ metadata:
   namespace: dev
   name: deployment
 rules:
-- apiGroups: ["apps"] # "" indicates the core API group
+- apiGroups: ["apps"] 
   resources: ["deployment"]
   verbs: ["create"]
   
@@ -292,7 +295,7 @@ metadata:
 subjects:
 # You can specify more than one "subject"
 - kind: user
-  name: deploymentteam # "name" is case sensitive
+  name: deploymentteam 
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   # "roleRef" specifies the binding to a Role / ClusterRole
@@ -302,8 +305,8 @@ roleRef:
 ================================================================================================================================================================
 
 Bonus 1
-1) To apply your configMap on multiple environment; the developer much not hardcode the pom.xml file assuming his application is java based app, so with this
-the username and the password of the environmental variables of the configMap can changed and easily applied in the staging and production environment; asuming container2 was deployed to the dev environment, in the staging and production env the configMap will be written as;
+1) To apply your configMap on multiple environment; the developer much not hardcode the pom.xml file assuming his application is java based, so with this
+the username and the password of the environmental variables of the configMap can change and easily applied in the staging and production environment; asuming container2 was deployed to the dev environment, in the staging and production env the configMap will be written as;
 
 --
 kind: ConfigMap 
@@ -324,7 +327,7 @@ data:
   # Configuration values can be set as key-value properties
   # configMap for the production env
   password: proddb@123
-These changes will be applied will deploying the containers in the env variable of the database in the staging and production environment.
+These changes will be applied while deploying the containers in the in the staging and production environment.
 
 Bonus2
 Auto-scaling a deployment based on network latency involves monitoring the latency metrics and adjusting the number of instances of the deployment dynamically to maintain optimal performance. To autoscale base on network latency we can do the following; Set Thresholds to determine the threshold values for latency metrics beyond which the deployment needs to scale up or down. For instance, you may set a threshold for the 99th percentile latency such that if it goes above a certain value for a specific duration, you'll need to scale up the deployment. Also, once the threshold value is reached, you can automate the deployment to scale up or down automatically. If the latency is high, the deployment can scale up by adding more instances to handle the increased traffic. Conversely, if the latency is low, the deployment can scale down by removing instances to save resources.
