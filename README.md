@@ -276,12 +276,12 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: dev
+  namespace: development
   name: deployment
 rules:
 - apiGroups: ["apps"] 
   resources: ["deployment"]
-  verbs: ["create"]
+  verbs: ["create","update"]
   
  ---
  
@@ -290,7 +290,7 @@ rules:
 kind: RoleBinding
 metadata:
   name: deploy-pods
-  namespace: dev
+  namespace: development
 subjects:
 # You can specify more than one "subject"
 - kind: user
