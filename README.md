@@ -5,7 +5,6 @@
 # In this manifest file container1 is the springapp that returns users from mongo database
 # DeploYment manifest file for container1
 
----
 apiVersion: v1
 kind: ConfigMap
 metadata: 
@@ -24,7 +23,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 2
-      maxsurge: 1
+      maxSurge: 1
   minReadySeconds: 30
   selector:
     matchLabels:
@@ -61,11 +60,11 @@ spec:
         livenessProbe:
           httpGet:
             path: /spring-boot-app
-            part: 8080
+            port: 8080
         readinessProbe:
           httpGet:
             path: /spring-boot-app
-            part: 8080
+            port: 8080
             
 ---
 apiVersion: v1
